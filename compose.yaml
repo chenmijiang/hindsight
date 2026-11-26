@@ -1,0 +1,26 @@
+services:
+  hindsight:
+    build: .
+    restart: unless-stopped
+    shm_size: 1gb
+    stop_grace_period: 75s
+    ports:
+      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:9999:9999"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      HINDSIGHT_API_LLM_PROVIDER: ${HINDSIGHT_API_LLM_PROVIDER:-ollama}
+      HINDSIGHT_API_LLM_BASE_URL: ${HINDSIGHT_API_LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      # Override in .env or the shell, then run docker compose up -d.
+      HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_API_LLM_MODEL:-minicpm5-2b:latest}
+      HINDSIGHT_API_LLM_MAX_CONCURRENT: ${HINDSIGHT_API_LLM_MAX_CONCURRENT:-1}
+      HINDSIGHT_API_LLM_OLLAMA_NUM_CTX: ${HINDSIGHT_API_LLM_OLLAMA_NUM_CTX:-32768}
+      HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS: ${HINDSIGHT_API_RETAIN_MAX_COMPLETION_TOKENS:-16000}
+      HINDSIGHT_API_WORKER_ID: ${HINDSIGHT_API_WORKER_ID:-hindsight-local}
+    volumes:
+      - hindsight-data:/home/hindsight/.pg0
+
+volumes:
+  hindsight-data:
